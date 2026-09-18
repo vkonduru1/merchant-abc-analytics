@@ -1,6 +1,10 @@
 """
 database.py — Async SQLAlchemy engine + session factory.
 Reads connection params from environment variables.
+
+Port note: Docker publishes Postgres on 5433 externally (5432 inside the container).
+  Local dev  → POSTGRES_PORT=5433
+  Inside Docker network → POSTGRES_PORT=5432  (service name: db)
 """
 import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
@@ -9,9 +13,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Connection string ──────────────────────────────────────────
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5433")   # 5433 = published Docker port
 POSTGRES_DB   = os.getenv("POSTGRES_DB",   "merchant_abc")
 POSTGRES_USER = os.getenv("POSTGRES_USER", "abc_user")
 POSTGRES_PASS = os.getenv("POSTGRES_PASSWORD", "abc_dev_password")
@@ -21,26 +24,24 @@ DATABASE_URL = (
     f"@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 )
 
-# ── Engine ─────────────────────────────────────────────────────
 engine = create_async_engine(
     DATABASE_URL,
-    echo=os.getenv("DEBUG", "true").lower() == "true",
+    echo=os.getenv("DEBUG", "false").lower() == "true",
     pool_size=10,
     max_overflow=20,
 )
 
-# ── Session factory ────────────────────────────────────────────
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
 )
 
-# ── Base class for ORM models ──────────────────────────────────
+
 class Base(DeclarativeBase):
     pass
 
-# ── Dependency for FastAPI routes ──────────────────────────────
+
 async def get_db():
     async with AsyncSessionLocal() as session:
         try:
