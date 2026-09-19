@@ -1,0 +1,570 @@
+[
+  {
+    "pipeline": "ML",
+    "cut_name": "Cut 1",
+    "n_customers": 496,
+    "accuracy": 0.1815,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "dont_send": {
+        "tp": 19,
+        "fn": 12,
+        "fn_rate": 0.387
+      },
+      "no_campaign_needed": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "no_campaign_impact": {
+        "tp": 71,
+        "fn": 394,
+        "fn_rate": 0.847
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        19,
+        6,
+        5
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        120,
+        0,
+        274,
+        71
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 121,
+      "no_campaign_needed": 280,
+      "dont_send": 19,
+      "no_campaign_impact": 76
+    },
+    "label_dist_true": {
+      "no_campaign_impact": 465,
+      "dont_send": 31
+    }
+  },
+  {
+    "pipeline": "Claude",
+    "cut_name": "Cut 1",
+    "n_customers": 496,
+    "accuracy": 0.6835,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "dont_send": {
+        "tp": 28,
+        "fn": 3,
+        "fn_rate": 0.097
+      },
+      "no_campaign_needed": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "no_campaign_impact": {
+        "tp": 311,
+        "fn": 154,
+        "fn_rate": 0.331
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        28,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        128,
+        0,
+        26,
+        311
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 128,
+      "no_campaign_impact": 311,
+      "no_campaign_needed": 29,
+      "dont_send": 28
+    },
+    "label_dist_true": {
+      "no_campaign_impact": 465,
+      "dont_send": 31
+    }
+  },
+  {
+    "pipeline": "ML",
+    "cut_name": "Cut 2",
+    "n_customers": 496,
+    "accuracy": 0.1815,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "dont_send": {
+        "tp": 19,
+        "fn": 12,
+        "fn_rate": 0.387
+      },
+      "no_campaign_needed": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "no_campaign_impact": {
+        "tp": 71,
+        "fn": 394,
+        "fn_rate": 0.847
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        19,
+        6,
+        5
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        120,
+        0,
+        274,
+        71
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 121,
+      "no_campaign_needed": 280,
+      "dont_send": 19,
+      "no_campaign_impact": 76
+    },
+    "label_dist_true": {
+      "no_campaign_impact": 465,
+      "dont_send": 31
+    }
+  },
+  {
+    "pipeline": "Claude",
+    "cut_name": "Cut 2",
+    "n_customers": 496,
+    "accuracy": 0.6835,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "dont_send": {
+        "tp": 28,
+        "fn": 3,
+        "fn_rate": 0.097
+      },
+      "no_campaign_needed": {
+        "tp": 0,
+        "fn": 0,
+        "fn_rate": 0
+      },
+      "no_campaign_impact": {
+        "tp": 311,
+        "fn": 154,
+        "fn_rate": 0.331
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        28,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        128,
+        0,
+        26,
+        311
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 128,
+      "no_campaign_impact": 311,
+      "no_campaign_needed": 29,
+      "dont_send": 28
+    },
+    "label_dist_true": {
+      "no_campaign_impact": 465,
+      "dont_send": 31
+    }
+  },
+  {
+    "pipeline": "ML",
+    "cut_name": "Cut 3",
+    "n_customers": 496,
+    "accuracy": 0.4073,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 71,
+        "fn": 60,
+        "fn_rate": 0.458
+      },
+      "dont_send": {
+        "tp": 19,
+        "fn": 12,
+        "fn_rate": 0.387
+      },
+      "no_campaign_needed": {
+        "tp": 41,
+        "fn": 21,
+        "fn_rate": 0.339
+      },
+      "no_campaign_impact": {
+        "tp": 71,
+        "fn": 201,
+        "fn_rate": 0.739
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        71,
+        0,
+        60,
+        0
+      ],
+      [
+        1,
+        19,
+        6,
+        5
+      ],
+      [
+        21,
+        0,
+        41,
+        0
+      ],
+      [
+        28,
+        0,
+        173,
+        71
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 121,
+      "no_campaign_needed": 280,
+      "dont_send": 19,
+      "no_campaign_impact": 76
+    },
+    "label_dist_true": {
+      "send_campaign": 131,
+      "no_campaign_needed": 62,
+      "no_campaign_impact": 272,
+      "dont_send": 31
+    }
+  },
+  {
+    "pipeline": "Claude",
+    "cut_name": "Cut 3",
+    "n_customers": 496,
+    "accuracy": 0.6573,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 69,
+        "fn": 62,
+        "fn_rate": 0.473
+      },
+      "dont_send": {
+        "tp": 28,
+        "fn": 3,
+        "fn_rate": 0.097
+      },
+      "no_campaign_needed": {
+        "tp": 15,
+        "fn": 47,
+        "fn_rate": 0.758
+      },
+      "no_campaign_impact": {
+        "tp": 214,
+        "fn": 58,
+        "fn_rate": 0.213
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        69,
+        0,
+        0,
+        62
+      ],
+      [
+        0,
+        28,
+        3,
+        0
+      ],
+      [
+        12,
+        0,
+        15,
+        35
+      ],
+      [
+        47,
+        0,
+        11,
+        214
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 128,
+      "no_campaign_impact": 311,
+      "no_campaign_needed": 29,
+      "dont_send": 28
+    },
+    "label_dist_true": {
+      "no_campaign_impact": 272,
+      "send_campaign": 131,
+      "no_campaign_needed": 62,
+      "dont_send": 31
+    }
+  },
+  {
+    "pipeline": "ML",
+    "cut_name": "Cut 4",
+    "n_customers": 496,
+    "accuracy": 0.4798,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 83,
+        "fn": 65,
+        "fn_rate": 0.439
+      },
+      "dont_send": {
+        "tp": 19,
+        "fn": 12,
+        "fn_rate": 0.387
+      },
+      "no_campaign_needed": {
+        "tp": 65,
+        "fn": 21,
+        "fn_rate": 0.244
+      },
+      "no_campaign_impact": {
+        "tp": 71,
+        "fn": 160,
+        "fn_rate": 0.693
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        83,
+        0,
+        65,
+        0
+      ],
+      [
+        1,
+        19,
+        6,
+        5
+      ],
+      [
+        21,
+        0,
+        65,
+        0
+      ],
+      [
+        16,
+        0,
+        144,
+        71
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 121,
+      "no_campaign_needed": 280,
+      "dont_send": 19,
+      "no_campaign_impact": 76
+    },
+    "label_dist_true": {
+      "no_campaign_impact": 231,
+      "send_campaign": 148,
+      "dont_send": 31,
+      "no_campaign_needed": 86
+    }
+  },
+  {
+    "pipeline": "Claude",
+    "cut_name": "Cut 4",
+    "n_customers": 496,
+    "accuracy": 0.6351,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 77,
+        "fn": 71,
+        "fn_rate": 0.48
+      },
+      "dont_send": {
+        "tp": 28,
+        "fn": 3,
+        "fn_rate": 0.097
+      },
+      "no_campaign_needed": {
+        "tp": 22,
+        "fn": 64,
+        "fn_rate": 0.744
+      },
+      "no_campaign_impact": {
+        "tp": 188,
+        "fn": 43,
+        "fn_rate": 0.186
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        77,
+        0,
+        0,
+        71
+      ],
+      [
+        0,
+        28,
+        3,
+        0
+      ],
+      [
+        12,
+        0,
+        22,
+        52
+      ],
+      [
+        39,
+        0,
+        4,
+        188
+      ]
+    ],
+    "label_dist_pred": {
+      "send_campaign": 128,
+      "no_campaign_impact": 311,
+      "no_campaign_needed": 29,
+      "dont_send": 28
+    },
+    "label_dist_true": {
+      "no_campaign_needed": 86,
+      "no_campaign_impact": 231,
+      "send_campaign": 148,
+      "dont_send": 31
+    }
+  }
+]

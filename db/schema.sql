@@ -436,7 +436,7 @@ CREATE TABLE customer_recommendations (
 
     -- Classification — multi-class output
     recommendation_label    VARCHAR(50)     NOT NULL,
-    -- send_campaign | dont_send | no_campaign_impact
+   -- send_campaign | dont_send | no_campaign_needed | no_campaign_impact
     confidence_score        DECIMAL(5,4),               -- 0.0000–1.0000
 
     -- Supporting signals fed to the agent
@@ -467,6 +467,26 @@ COMMENT ON TABLE customer_recommendations IS
      Multi-class classification: send_campaign | dont_send | no_campaign_impact.
      reasoning column stores the LLM agent narrative explaining the classification.
      Backtest columns populated when run against historical holdout data.';
+
+-- ── Pipeline-specific recommendation tables (pipeline_v2) ──────────────
+-- Separate tables prevent upsert collision between ML and Claude pipelines.
+-- Both mirror customer_recommendations schema exactly.
+
+CREATE TABLE IF NOT EXISTS customer_recommendations_ml (
+    LIKE customer_recommendations INCLUDING ALL
+);
+ALTER TABLE customer_recommendations_ml
+    DROP CONSTRAINT IF EXISTS cr_ml_customer_id_key;
+ALTER TABLE customer_recommendations_ml
+    ADD CONSTRAINT cr_ml_customer_id_key UNIQUE (customer_id);
+
+CREATE TABLE IF NOT EXISTS customer_recommendations_claude (
+    LIKE customer_recommendations INCLUDING ALL
+);
+ALTER TABLE customer_recommendations_claude
+    DROP CONSTRAINT IF EXISTS cr_claude_customer_id_key;
+ALTER TABLE customer_recommendations_claude
+    ADD CONSTRAINT cr_claude_customer_id_key UNIQUE (customer_id);
 
 -- ============================================================
 -- Useful views
@@ -514,3 +534,4 @@ ORDER BY avg_lifetime_revenue DESC;
 COMMENT ON VIEW v_attribution_summary IS
     'High-level attribution segment summary — the key business output of this use case.
      Answers: which customer segment (by campaigns before purchase) generates the most revenue?';
+

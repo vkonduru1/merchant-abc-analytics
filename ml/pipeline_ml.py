@@ -115,7 +115,7 @@ ANCHOR_FEATURES = [
 ]
 
 UPSERT_SQL = """
-INSERT INTO customer_recommendations (
+INSERT INTO customer_recommendations_ml (
     customer_id, recommendation_label, confidence_score,
     reasoning, key_signals, recommended_at, model_version
 ) VALUES (%s, %s, %s, %s, %s, NOW(), 'ml-v2-pipeline')
