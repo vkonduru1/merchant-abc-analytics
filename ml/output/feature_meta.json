@@ -1,0 +1,95 @@
+{
+  "n_customers": 496,
+  "n_features": 13,
+  "features": [
+    {
+      "col": "total_revenue",
+      "grade": 1,
+      "weight": 1.0,
+      "description": "LTV \u2014 total lifetime revenue"
+    },
+    {
+      "col": "total_orders",
+      "grade": 1,
+      "weight": 1.0,
+      "description": "Total number of orders"
+    },
+    {
+      "col": "campaign_influence_rate",
+      "grade": 1,
+      "weight": 1.0,
+      "description": "% orders influenced by campaigns"
+    },
+    {
+      "col": "average_order_value",
+      "grade": 2,
+      "weight": 0.8,
+      "description": "Average order value"
+    },
+    {
+      "col": "email_open_rate",
+      "grade": 2,
+      "weight": 0.8,
+      "description": "Email open rate"
+    },
+    {
+      "col": "avg_campaigns_before_purchase",
+      "grade": 2,
+      "weight": 0.8,
+      "description": "Avg campaigns before each purchase"
+    },
+    {
+      "col": "recency_days",
+      "grade": 3,
+      "weight": 0.6,
+      "description": "Days since last purchase"
+    },
+    {
+      "col": "email_click_rate",
+      "grade": 3,
+      "weight": 0.6,
+      "description": "Email click rate"
+    },
+    {
+      "col": "spend_last_12_months",
+      "grade": 3,
+      "weight": 0.6,
+      "description": "Spend in last 12 months"
+    },
+    {
+      "col": "frequency_months",
+      "grade": 4,
+      "weight": 0.4,
+      "description": "Avg months between purchases"
+    },
+    {
+      "col": "spend_last_3_months",
+      "grade": 4,
+      "weight": 0.4,
+      "description": "Spend in last 3 months"
+    },
+    {
+      "col": "total_purchases_with_campaign",
+      "grade": 5,
+      "weight": 0.2,
+      "description": "Count of campaign-influenced orders"
+    },
+    {
+      "col": "total_campaigns_received",
+      "grade": 5,
+      "weight": 0.2,
+      "description": "Total campaigns received"
+    }
+  ],
+  "silhouette_scores": {
+    "2": 0.441213,
+    "3": 0.385012,
+    "4": 0.384977,
+    "5": 0.358257,
+    "6": 0.311974,
+    "7": 0.28611
+  },
+  "best_k": 2,
+  "silhouette_threshold": 0.6,
+  "normalization": "VS: (x - mean) / (max - min)"
+}

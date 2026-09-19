@@ -1,0 +1,209 @@
+[
+  {
+    "cut_name": "Cut 1",
+    "train_end": "2022-06-30",
+    "test_start": "2022-07-01",
+    "test_end": "2022-12-31",
+    "n_train": 496,
+    "n_test": 496,
+    "accuracy": 0.7843,
+    "fn_rates": {
+      "dont_send": {
+        "tp": 28,
+        "fn": 0,
+        "fn_rate": 0.0
+      },
+      "no_campaign_needed": {
+        "tp": 56,
+        "fn": 70,
+        "fn_rate": 0.556
+      },
+      "no_campaign_impact": {
+        "tp": 305,
+        "fn": 37,
+        "fn_rate": 0.108
+      }
+    },
+    "cm_labels": [
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        28,
+        0,
+        0
+      ],
+      [
+        1,
+        56,
+        69
+      ],
+      [
+        2,
+        35,
+        305
+      ]
+    ]
+  },
+  {
+    "cut_name": "Cut 2",
+    "train_end": "2022-12-31",
+    "test_start": "2023-01-01",
+    "test_end": "2023-06-30",
+    "n_train": 496,
+    "n_test": 496,
+    "accuracy": 0.7177,
+    "fn_rates": {
+      "dont_send": {
+        "tp": 28,
+        "fn": 0,
+        "fn_rate": 0.0
+      },
+      "no_campaign_needed": {
+        "tp": 102,
+        "fn": 57,
+        "fn_rate": 0.358
+      },
+      "no_campaign_impact": {
+        "tp": 226,
+        "fn": 83,
+        "fn_rate": 0.269
+      }
+    },
+    "cm_labels": [
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        28,
+        0,
+        0
+      ],
+      [
+        2,
+        102,
+        55
+      ],
+      [
+        1,
+        82,
+        226
+      ]
+    ]
+  },
+  {
+    "cut_name": "Cut 3",
+    "train_end": "2023-06-30",
+    "test_start": "2023-07-01",
+    "test_end": "2023-12-31",
+    "n_train": 496,
+    "n_test": 364,
+    "accuracy": 0.5797,
+    "fn_rates": {
+      "dont_send": {
+        "tp": 28,
+        "fn": 0,
+        "fn_rate": 0.0
+      },
+      "no_campaign_needed": {
+        "tp": 19,
+        "fn": 44,
+        "fn_rate": 0.698
+      },
+      "no_campaign_impact": {
+        "tp": 164,
+        "fn": 109,
+        "fn_rate": 0.399
+      }
+    },
+    "cm_labels": [
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        28,
+        0,
+        0
+      ],
+      [
+        1,
+        19,
+        43
+      ],
+      [
+        1,
+        108,
+        164
+      ]
+    ]
+  },
+  {
+    "cut_name": "Cut 4",
+    "train_end": "2023-12-31",
+    "test_start": "2024-01-01",
+    "test_end": "2024-06-30",
+    "n_train": 496,
+    "n_test": 496,
+    "accuracy": 0.5121,
+    "fn_rates": {
+      "send_campaign": {
+        "tp": 95,
+        "fn": 55,
+        "fn_rate": 0.367
+      },
+      "dont_send": {
+        "tp": 28,
+        "fn": 0,
+        "fn_rate": 0.0
+      },
+      "no_campaign_needed": {
+        "tp": 34,
+        "fn": 52,
+        "fn_rate": 0.605
+      },
+      "no_campaign_impact": {
+        "tp": 97,
+        "fn": 135,
+        "fn_rate": 0.582
+      }
+    },
+    "cm_labels": [
+      "send_campaign",
+      "dont_send",
+      "no_campaign_needed",
+      "no_campaign_impact"
+    ],
+    "cm": [
+      [
+        95,
+        2,
+        39,
+        14
+      ],
+      [
+        0,
+        28,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        34,
+        52
+      ],
+      [
+        47,
+        1,
+        87,
+        97
+      ]
+    ]
+  }
+]

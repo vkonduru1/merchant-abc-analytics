@@ -1,0 +1,26 @@
+{
+  "k": 2,
+  "silhouette_score": 0.441213,
+  "inertia": 192.92,
+  "label_counts": {
+    "send_campaign": 329,
+    "no_campaign_impact": 160,
+    "dont_send": 7
+  },
+  "cluster_info": {
+    "0": {
+      "likely": 0,
+      "anchor_wins": 2,
+      "n_customers": 167
+    },
+    "1": {
+      "likely": 1,
+      "anchor_wins": 3,
+      "n_customers": 329
+    }
+  },
+  "thresholds": {
+    "influence_rate": 0.3,
+    "recency_dont_send_days": 14
+  }
+}
