@@ -1,0 +1,102 @@
+{
+  "version": "v2",
+  "created": "2026-09-19",
+  "description": "Canonical feature set for pipeline_v2. Used identically by ml/pipeline_ml.py and agents/pipeline_claude.py. Do not modify without re-running 01_feature_analysis.py.",
+  "thresholds": {
+    "correlation": 0.75,
+    "vif": 5.0,
+    "importance": 0.02
+  },
+  "features": [
+    {
+      "column": "recency_days",
+      "description": "Days since last purchase",
+      "rationale": "Strongest individual predictor in v1 RFC (25.6% importance)",
+      "rfc_importance": 0.2428,
+      "vif": 1.79
+    },
+    {
+      "column": "total_campaigns_received",
+      "description": "Total campaigns received (lifetime)",
+      "rationale": "Campaign exposure volume",
+      "rfc_importance": 0.1333,
+      "vif": 2.73
+    },
+    {
+      "column": "spend_last_3_months",
+      "description": "Revenue in last 3 months ($)",
+      "rationale": "Recent activity signal \u2014 detects reactivation or churn",
+      "rfc_importance": 0.073,
+      "vif": 2.13
+    },
+    {
+      "column": "months_since_customer",
+      "description": "Months since customer first created",
+      "rationale": "Customer tenure \u2014 longevity signal",
+      "rfc_importance": 0.0646,
+      "vif": 1.91
+    },
+    {
+      "column": "frequency_months",
+      "description": "Average months between purchases",
+      "rationale": "Purchase cadence \u2014 lower = more frequent buyer",
+      "rfc_importance": 0.0509,
+      "vif": 1.72
+    },
+    {
+      "column": "stddev_days_campaign_to_purchase",
+      "description": "Std deviation of campaign-to-purchase lag",
+      "rationale": "Response consistency \u2014 predictability of conversion timing",
+      "rfc_importance": 0.0435,
+      "vif": 1.5
+    },
+    {
+      "column": "avg_days_campaign_to_purchase",
+      "description": "Avg days from campaign send to purchase (influenced orders only)",
+      "rationale": "Response speed \u2014 how quickly this customer converts after a campaign",
+      "rfc_importance": 0.0331,
+      "vif": 1.51
+    },
+    {
+      "column": "spend_last_12_months",
+      "description": "Revenue in last 12 months ($)",
+      "rationale": "Annual spend window \u2014 stabilises seasonal variation",
+      "rfc_importance": 0.0322,
+      "vif": 3.75
+    },
+    {
+      "column": "email_open_rate",
+      "description": "Email open rate (0-1)",
+      "rationale": "Engagement with campaigns \u2014 attention signal",
+      "rfc_importance": 0.0176,
+      "vif": 2.61
+    },
+    {
+      "column": "campaign_influence_rate",
+      "description": "Fraction of orders with a campaign in 30d window (0-1)",
+      "rationale": "Core attribution signal \u2014 measures campaign dependency",
+      "rfc_importance": 0,
+      "vif": 0
+    }
+  ],
+  "dropped_features": [
+    "total_revenue",
+    "total_orders",
+    "average_order_value",
+    "email_click_rate",
+    "avg_campaigns_before_purchase",
+    "total_purchases_with_campaign",
+    "days_since_last_campaign"
+  ],
+  "corr_pair_decisions": [
+    {
+      "pair": [
+        "email_open_rate",
+        "email_click_rate"
+      ],
+      "r": 0.7542,
+      "kept": "email_open_rate",
+      "dropped": "email_click_rate"
+    }
+  ]
+}

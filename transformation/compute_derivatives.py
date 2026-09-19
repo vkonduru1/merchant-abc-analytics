@@ -302,6 +302,39 @@ def compute_one(customer_id: str, evts: list[dict], as_of: datetime,
     else:
         segment = "campaign_gt5"
 
+    # ── Campaign-to-purchase response lag (new features) ──────────────────
+    # For each campaign-influenced order, compute the gap in days between
+    # the most recent campaign send before the order and the order date.
+    # avg = mean response speed across all influenced orders
+    # stddev = consistency/predictability of response timing
+    #
+    # A customer with avg=2d, stddev=0d → fast, consistent responder
+    # A customer with avg=15d, stddev=8d → slow, unpredictable responder
+    # NULL for customers with no campaign-influenced orders
+    lags: list[float] = []
+    for o in attr_orders:
+        if o["date"] < CAMPAIGN_START:
+            continue
+        # Find the most recent campaign send strictly before this order
+        prior_campaigns = [cd for cd in campaign_dates if cd < o["date"]]
+        if not prior_campaigns:
+            continue
+        last_camp = max(prior_campaigns)
+        lag_days = (o["date"] - last_camp).days
+        # Only include if there was actually a campaign in the 30d window
+        lo = o["date"] - timedelta(days=ATTRIBUTION_WINDOW_DAYS)
+        if last_camp >= lo:
+            lags.append(float(lag_days))
+
+    avg_response_lag   = round(sum(lags) / len(lags), 2) if lags else None
+    stddev_response_lag = None
+    if len(lags) >= 2:
+        mean_lag = sum(lags) / len(lags)
+        variance = sum((x - mean_lag) ** 2 for x in lags) / (len(lags) - 1)
+        stddev_response_lag = round(variance ** 0.5, 2)
+    elif len(lags) == 1:
+        stddev_response_lag = 0.0  # single order → no spread
+
     return {
         "customer_id":                      customer_id,
         "run_id":                           run_id,
@@ -338,6 +371,8 @@ def compute_one(customer_id: str, evts: list[dict], as_of: datetime,
         "avg_campaigns_before_purchase":    avg_camps_before,
         "campaigns_before_first_purchase":  camps_before_first,
         "total_purchases_with_campaign":    purchases_with_campaign,
+        "avg_days_campaign_to_purchase":    avg_response_lag,
+        "stddev_days_campaign_to_purchase": stddev_response_lag,
         "total_purchases_without_campaign": purchases_without_campaign,
         "campaign_influence_rate":          influence_rate,
         "attribution_segment":              segment,
@@ -362,7 +397,8 @@ INSERT INTO customer_derivatives (
     email_open_rate, email_click_rate, days_since_last_campaign,
     avg_campaigns_before_purchase, campaigns_before_first_purchase,
     total_purchases_with_campaign, total_purchases_without_campaign,
-    campaign_influence_rate, attribution_segment
+    campaign_influence_rate, attribution_segment,
+    avg_days_campaign_to_purchase, stddev_days_campaign_to_purchase
 ) VALUES (
     %(customer_id)s, %(run_id)s, CURRENT_DATE,
     %(first_purchase_date)s, %(second_purchase_date)s, %(latest_purchase_date)s,
@@ -377,7 +413,8 @@ INSERT INTO customer_derivatives (
     %(email_open_rate)s, %(email_click_rate)s, %(days_since_last_campaign)s,
     %(avg_campaigns_before_purchase)s, %(campaigns_before_first_purchase)s,
     %(total_purchases_with_campaign)s, %(total_purchases_without_campaign)s,
-    %(campaign_influence_rate)s, %(attribution_segment)s
+    %(campaign_influence_rate)s, %(attribution_segment)s,
+    %(avg_days_campaign_to_purchase)s, %(stddev_days_campaign_to_purchase)s
 )
 ON CONFLICT (customer_id, run_id) DO UPDATE SET
     total_orders                    = EXCLUDED.total_orders,
@@ -385,6 +422,8 @@ ON CONFLICT (customer_id, run_id) DO UPDATE SET
     attribution_segment             = EXCLUDED.attribution_segment,
     campaign_influence_rate         = EXCLUDED.campaign_influence_rate,
     avg_campaigns_before_purchase   = EXCLUDED.avg_campaigns_before_purchase,
+    avg_days_campaign_to_purchase   = EXCLUDED.avg_days_campaign_to_purchase,
+    stddev_days_campaign_to_purchase = EXCLUDED.stddev_days_campaign_to_purchase,
     updated_at                      = NOW()
 """
 
