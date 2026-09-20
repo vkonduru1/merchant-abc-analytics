@@ -1,0 +1,31 @@
+{
+  "case": "case_01",
+  "change": "RFC argmax direct \u2014 HYP segmentation removed",
+  "accuracy": 1.0,
+  "mean_cv_acc": 0.9805,
+  "avg_confidence": 0.9591,
+  "label_dist": {
+    "no_campaign_needed": 148,
+    "send_campaign": 246,
+    "no_campaign_impact": 71,
+    "dont_send": 31
+  },
+  "gt_dist": {
+    "no_campaign_needed": 148,
+    "send_campaign": 246,
+    "no_campaign_impact": 71,
+    "dont_send": 31
+  },
+  "feature_importance": {
+    "recency_days": 0.385,
+    "campaign_influence_rate": 0.2259,
+    "spend_last_12_months": 0.1127,
+    "spend_last_3_months": 0.0733,
+    "stddev_days_campaign_to_purchase": 0.0597,
+    "total_campaigns_received": 0.0436,
+    "avg_days_campaign_to_purchase": 0.0389,
+    "email_open_rate": 0.0291,
+    "months_since_customer": 0.016,
+    "frequency_months": 0.0159
+  }
+}

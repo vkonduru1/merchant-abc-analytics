@@ -461,6 +461,56 @@ def full_report(all_results: list, agreement: pd.DataFrame,
 
 
 # ══════════════════════════════════════════════════════════════════════════
+def print_confusion_matrix(result: dict, pipeline_name: str) -> None:
+    """Print a readable confusion matrix for one temporal cut."""
+    if not result or not result.get("cm"):
+        return
+    labels = result["cm_labels"]
+    cm     = np.array(result["cm"])
+    n      = cm.shape[0]
+
+    # Header
+    col_w  = 10
+    print(f"\n    Confusion matrix — {pipeline_name} — {result['cut_name']}"
+          f"  (rows=actual, cols=predicted)")
+    header = "    " + " " * 14 + "".join(
+        f"{l[:col_w]:>{col_w}}" for l in labels
+    )
+    print(header)
+    print("    " + "─" * (14 + col_w * n))
+
+    for i, row_label in enumerate(labels):
+        row_str = f"    {row_label[:13]:<14}"
+        for j in range(n):
+            val = int(cm[i, j])
+            # Highlight diagonal (correct) and large off-diagonal errors
+            marker = "►" if (i != j and val > 20) else " "
+            row_str += f"{marker}{val:>{col_w-1}}"
+        # Add FN rate for this label
+        tp = int(cm[i, i])
+        fn = int(cm[i].sum() - cm[i, i])
+        fn_rate = fn / (tp + fn) if (tp + fn) > 0 else 0
+        row_str += f"   FN={fn_rate:.0%}"
+        print(row_str)
+
+    print()
+
+    # Highlight the biggest off-diagonal errors
+    errors = []
+    for i in range(n):
+        for j in range(n):
+            if i != j and cm[i, j] > 0:
+                errors.append((int(cm[i, j]), labels[i], labels[j]))
+    errors.sort(reverse=True)
+    if errors:
+        print(f"    Top misclassifications ({pipeline_name}):")
+        for count, actual, predicted in errors[:4]:
+            print(f"      Actual={actual:<26} "
+                  f"Predicted={predicted:<26} n={count:>4}")
+    print()
+
+
+# ══════════════════════════════════════════════════════════════════════════
 def main() -> None:
     ap = argparse.ArgumentParser(
         description="Backtest comparison: ML v2 vs Claude v2 pipelines.")
@@ -520,12 +570,14 @@ def main() -> None:
         all_results.append(ml_result)
         if ml_result:
             print(f"  ML    accuracy: {ml_result['accuracy']:.3f}")
+            print_confusion_matrix(ml_result, "ML")
 
         # Claude evaluation
         cld_result = evaluate_cut(claude_df, actuals, "Claude", cut_name)
         all_results.append(cld_result)
         if cld_result:
             print(f"  Claude accuracy: {cld_result['accuracy']:.3f}")
+            print_confusion_matrix(cld_result, "Claude")
 
     # Agreement matrix
     print("\nBuilding agreement matrix …")
