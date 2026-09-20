@@ -197,3 +197,4 @@ and produces a true out-of-time evaluation.
   Cuts 1-2 accuracy improves (features match the window)
   Overall mean accuracy rises for ML
   Gap to Claude narrows further or inverts
+

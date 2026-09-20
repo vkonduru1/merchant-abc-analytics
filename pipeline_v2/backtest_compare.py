@@ -155,25 +155,35 @@ def load_ground_truth(conn) -> pd.DataFrame:
 def load_pipeline_predictions(conn) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Load predictions from separate pipeline tables.
-    customer_recommendations_ml     → ML v2 pipeline
+    customer_recommendations_ml     → latest ML case (highest run)
     customer_recommendations_claude → Claude v2 pipeline
+
+    Always uses the most recently written model_version in each table
+    so backtest_compare.py automatically picks up new case iterations.
     """
+    # Load latest ML predictions (most recent model_version written)
     ml_df = pd.read_sql("""
-        SELECT customer_id, recommendation_label,
-               confidence_score, model_version
+        SELECT DISTINCT ON (customer_id)
+            customer_id, recommendation_label,
+            confidence_score, model_version
         FROM customer_recommendations_ml
+        ORDER BY customer_id, recommended_at DESC
     """, conn)
     ml_df["customer_id"] = ml_df["customer_id"].astype(str)
 
     claude_df = pd.read_sql("""
-        SELECT customer_id, recommendation_label,
-               confidence_score, model_version
+        SELECT DISTINCT ON (customer_id)
+            customer_id, recommendation_label,
+            confidence_score, model_version
         FROM customer_recommendations_claude
+        ORDER BY customer_id, recommended_at DESC
     """, conn)
     claude_df["customer_id"] = claude_df["customer_id"].astype(str)
 
-    print(f"  ML predictions loaded    : {len(ml_df):,}")
-    print(f"  Claude predictions loaded: {len(claude_df):,}")
+    ml_version  = ml_df["model_version"].iloc[0] if len(ml_df) else "none"
+    cld_version = claude_df["model_version"].iloc[0] if len(claude_df) else "none"
+    print(f"  ML predictions loaded    : {len(ml_df):,}  [{ml_version}]")
+    print(f"  Claude predictions loaded: {len(claude_df):,}  [{cld_version}]")
     return ml_df, claude_df
 
 

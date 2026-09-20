@@ -1,0 +1,46 @@
+[
+  {
+    "cut": "Cut 1",
+    "accuracy": 0.958,
+    "fn_rates": {
+      "dont_send": 0.2903,
+      "no_campaign_impact": 0.0256
+    },
+    "n_train": 500,
+    "n_test": 500
+  },
+  {
+    "cut": "Cut 2",
+    "accuracy": 0.954,
+    "fn_rates": {
+      "dont_send": 0.5161,
+      "no_campaign_impact": 0.0149
+    },
+    "n_train": 500,
+    "n_test": 500
+  },
+  {
+    "cut": "Cut 3",
+    "accuracy": 0.566,
+    "fn_rates": {
+      "send_campaign": 1.0,
+      "dont_send": 0.6452,
+      "no_campaign_needed": 1.0,
+      "no_campaign_impact": 0.0145
+    },
+    "n_train": 500,
+    "n_test": 500
+  },
+  {
+    "cut": "Cut 4",
+    "accuracy": 0.754,
+    "fn_rates": {
+      "send_campaign": 0.0,
+      "dont_send": 0.7742,
+      "no_campaign_needed": 0.5116,
+      "no_campaign_impact": 0.234
+    },
+    "n_train": 500,
+    "n_test": 500
+  }
+]

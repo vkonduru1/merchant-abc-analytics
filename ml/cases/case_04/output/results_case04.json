@@ -1,0 +1,50 @@
+[
+  {
+    "cut": "Cut 1",
+    "accuracy": 0.5847,
+    "ml_only": 0.4577,
+    "claude_only": 0.6835,
+    "fn_rates": {
+      "send_campaign": 0,
+      "dont_send": 0.5484,
+      "no_campaign_needed": 0,
+      "no_campaign_impact": 0.4065
+    }
+  },
+  {
+    "cut": "Cut 2",
+    "accuracy": 0.5847,
+    "ml_only": 0.4577,
+    "claude_only": 0.6835,
+    "fn_rates": {
+      "send_campaign": 0,
+      "dont_send": 0.5484,
+      "no_campaign_needed": 0,
+      "no_campaign_impact": 0.4065
+    }
+  },
+  {
+    "cut": "Cut 3",
+    "accuracy": 0.631,
+    "ml_only": 0.6633,
+    "claude_only": 0.6573,
+    "fn_rates": {
+      "send_campaign": 0.313,
+      "dont_send": 0.5484,
+      "no_campaign_needed": 0.7581,
+      "no_campaign_impact": 0.2868
+    }
+  },
+  {
+    "cut": "Cut 4",
+    "accuracy": 0.7984,
+    "ml_only": 0.752,
+    "claude_only": 0.6351,
+    "fn_rates": {
+      "send_campaign": 0.1351,
+      "dont_send": 0.5484,
+      "no_campaign_needed": 0.5349,
+      "no_campaign_impact": 0.0736
+    }
+  }
+]
