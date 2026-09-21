@@ -480,6 +480,9 @@ ALTER TABLE customer_recommendations_ml
 ALTER TABLE customer_recommendations_ml
     ADD CONSTRAINT cr_ml_customer_id_key UNIQUE (customer_id);
 
+ALTER TABLE customer_recommendations_ml
+    ADD COLUMN IF NOT EXISTS friendly_reasoning TEXT;
+
 CREATE TABLE IF NOT EXISTS customer_recommendations_claude (
     LIKE customer_recommendations INCLUDING ALL
 );
