@@ -32,15 +32,15 @@ function AIIRStrip() {
     },
     {
       letter: 'R', label: 'Recommendation',
-      desc: 'Claude reads the Interpretation layer and classifies. 4 labels + written reasoning per customer.',
+      desc: 'Confidence-based ensemble: RFC classifies at high confidence (≥0.80), Claude reasons through edge cases (<0.60), middle-band predictions flagged for review. 4 labels + written reasoning per customer.',
       table: 'customer_recommendations',
     },
   ]
   return (
-    <div className="rounded-xl mb-6 overflow-hidden" style={{ background: '#17274C' }}>
+    <div className="rounded-xl mb-6 overflow-hidden" style={{ background: '#1D3251' }}>
       {/* Pre-AIIR note */}
-      <div className="px-5 py-3 text-[12px]" style={{ borderBottom: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)' }}>
-        <span className="font-bold tracking-widest uppercase mr-2" style={{ color: '#C85510' }}>Pre-AIIR (ETL)</span>
+      <div className="px-5 py-3 text-[12px]" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
+        <span className="font-bold tracking-widest uppercase mr-2" style={{ color: '#D4884A' }}>Pre-AIIR (ETL)</span>
         <span style={{ color: 'rgba(255,255,255,0.75)' }}>Identity resolution — Shopify + Klaviyo joined via email · <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.55)' }}>customer_identity_map · customer_events</span> · This is infrastructure, not the framework</span>
       </div>
       {/* AIIR columns */}
@@ -51,7 +51,7 @@ function AIIRStrip() {
               borderRight: i < items.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
               paddingLeft: i === 0 ? 0 : undefined,
             }}>
-            <div className="text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: '#C85510' }}>
+            <div className="text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: '#D4884A' }}>
               {item.letter} — {item.label}
             </div>
             <div className="text-[12px] leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
@@ -76,13 +76,13 @@ function SegmentBar({ segment, pct, ltv, customers, maxLtv }) {
         <div className="text-[12px] font-semibold" style={{ color: highlight ? '#17274C' : '#374151', fontFamily: 'monospace' }}>
           {segment}
         </div>
-        <div className="text-[12px] font-bold" style={{ color: highlight ? '#C85510' : '#374151' }}>
+        <div className="text-[12px] font-bold" style={{ color: highlight ? '#C26820' : '#374151' }}>
           ${ltv?.toLocaleString() ?? 0}
         </div>
       </div>
       <div className="rounded-sm" style={{ background: '#F3F4F6', height: 8 }}>
         <div className="rounded-sm h-2 transition-all duration-500"
-          style={{ background: highlight ? '#C85510' : '#C2CBE8', width: `${w}%` }} />
+          style={{ background: highlight ? '#C26820' : '#C2CBE8', width: `${w}%` }} />
       </div>
       {customers && (
         <div className="text-[10px] text-gray-400 mt-0.5">{customers.toLocaleString()} customers</div>
@@ -194,7 +194,7 @@ export default function Analytics() {
                 {s.avg_campaigns != null ? s.avg_campaigns : <span className="text-gray-400">—</span>}
               </div>
               <div className="text-[13px] font-bold"
-                style={{ color: s.avg_ltv > 0 ? (s.segment === 'campaign_3_5' ? '#C85510' : '#374151') : '#9CA3AF' }}>
+                style={{ color: s.avg_ltv > 0 ? (s.segment === 'campaign_3_5' ? '#C26820' : '#374151') : '#9CA3AF' }}>
                 ${(s.avg_ltv ?? 0).toLocaleString()}
               </div>
               <div className="text-[13px]"
@@ -210,7 +210,7 @@ export default function Analytics() {
       <div className="rounded-xl p-4 flex gap-4 items-start"
         style={{ background: '#FBF8F2', border: '1px solid #E4D5C2' }}>
         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: '#C85510' }}>
+          style={{ background: '#C26820' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>

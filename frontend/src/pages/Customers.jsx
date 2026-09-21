@@ -19,6 +19,36 @@ const FILTERS = [
   { id: 'no_campaign_impact',label: 'No Campaign Impact' },
 ]
 
+// Strip internal ML jargon from raw reasoning (used as fallback)
+function cleanRawReasoning(text) {
+  if (!text) return ''
+  return text
+    .replace(/ML pipeline \(v\d+\)\s*/gi, '')
+    .replace(/ml-case\w+-?\w*/gi, '')
+    .replace(/HYP_TP|HYP_FP|HYP_FN|HYP_TN/gi, '')
+    .replace(/classifies as\s+[A-Z_]+\s*—\s*/gi, '')
+    .replace(/RFC signals (Likely|Unlikely);?\s*/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^[·\-–—\s]+/, '')
+    .trim()
+}
+
+// Translate reasoning via backend proxy — API key stays server-side
+async function translateReasoning(rawReasoning, keySignals, customerData) {
+  try {
+    const res = await axios.post(`${API}/recommendations/translate-reasoning`, {
+      customer_id: customerData.customer_id || null,
+      reasoning:   rawReasoning,
+      key_signals: keySignals || [],
+      orders:      customerData.orders || 0,
+      ltv:         customerData.ltv    || 0,
+    })
+    return res.data?.translation || null
+  } catch {
+    return null
+  }
+}
+
 function LabelBadge({ label }) {
   const meta = LABEL_META[label]
   if (!meta) return <span className="text-[11px] text-gray-400 font-mono">{label ?? '—'}</span>
@@ -29,19 +59,85 @@ function LabelBadge({ label }) {
 }
 
 function DrillDown({ c }) {
+  const [friendly, setFriendly] = useState(null)
+  const [loading,  setLoading]  = useState(false)
+
+  const rawReasoning = c.recommendation_reasoning || c.reasoning || ''
+  const keySignals   = c.key_signals || []
+
+  useEffect(() => {
+    if (!rawReasoning || friendly) return
+    setLoading(true)
+    translateReasoning(
+      rawReasoning,
+      keySignals,
+      { customer_id: c.customer_id, orders: c.total_orders || 0, ltv: Math.round(c.lifetime_revenue ?? c.total_revenue ?? 0) }
+    ).then(result => {
+      setFriendly(result || cleanRawReasoning(rawReasoning))
+      setLoading(false)
+    })
+  }, [c._id])
+
+  const meta = LABEL_META[c._label]
+
   return (
-    <div className="px-4 py-3.5 border-t border-dashed" style={{ background: '#F8FEF9', borderColor: '#D1FAE5' }}>
-      <div className="text-[11px] font-bold tracking-widest uppercase mb-2" style={{ color: '#15803D' }}>Claude's Reasoning</div>
-      <p className="text-[13px] leading-relaxed mb-2.5 italic"
-        style={{ fontFamily: 'Georgia, serif', color: '#374151', margin: '0 0 10px' }}>
-        "{c.recommendation_reasoning || c.reasoning || 'No reasoning recorded.'}"
-      </p>
+    <div className="px-4 py-3.5 border-t"
+      style={{ background: `${meta?.bg ?? '#F9FAFB'}99`, borderColor: 'rgba(0,0,0,0.06)', borderStyle: 'solid' }}>
+
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2.5">
+        <div className="text-[11px] font-bold tracking-widest uppercase" style={{ color: meta?.textColor ?? '#374151' }}>
+          Why this recommendation
+        </div>
+        {!loading && friendly && (
+          <div className="text-[10px] text-gray-400 flex items-center gap-1">
+            <span style={{ color: '#C26820' }}>✦</span> Claude summary
+          </div>
+        )}
+      </div>
+
+      {/* Loading state — no flash, just a gentle indicator */}
+      {loading && (
+        <div className="flex items-center gap-2 py-2">
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#C26820' }} />
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#C26820', animationDelay: '0.2s' }} />
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#C26820', animationDelay: '0.4s' }} />
+        </div>
+      )}
+
+      {/* Summary — only shown once Claude responds */}
+      {!loading && friendly && (
+        <p className="text-[13.5px] leading-relaxed mb-3 italic"
+          style={{ fontFamily: 'Georgia, serif', color: '#1F2937', margin: '0 0 12px' }}>
+          "{friendly}"
+        </p>
+      )}
+
+      {/* Signal chips — cleaned of jargon */}
+      {keySignals.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2.5">
+          {keySignals
+            .map(s => s
+              .replace(/RFC (original|confidence):[^,·]*/gi, '')
+              .replace(/ml-case\w+/gi, '').replace(/HYP_\w+/gi, '')
+              .replace(/routing:\s*/gi, '').trim()
+            )
+            .filter(s => s.length > 3).slice(0, 3)
+            .map((s, i) => (
+              <span key={i} style={{ fontSize: 11, background: 'rgba(0,0,0,0.05)', padding: '2px 10px', borderRadius: 100, color: '#6B7280' }}>
+                {s}
+              </span>
+            ))}
+        </div>
+      )}
+
+      {/* Stats row */}
       <div className="flex flex-wrap gap-4 text-[11px] text-gray-500">
-        {c.avg_influence_rate_pct != null && <span><span className="mr-1" style={{color:'#C85510'}}>•</span>{c.avg_influence_rate_pct}% influence rate</span>}
-        {c.email_open_rate_pct    != null && <span><span className="mr-1" style={{color:'#C85510'}}>•</span>{c.email_open_rate_pct}% open rate</span>}
-        {c.total_orders           != null && <span><span className="mr-1" style={{color:'#C85510'}}>•</span>{c.total_orders} orders</span>}
-        {c.lifetime_revenue       != null && <span><span className="mr-1" style={{color:'#C85510'}}>•</span>${Number(c.lifetime_revenue).toFixed(0)} LTV</span>}
-        {c.confidence_score       != null && <span><span className="mr-1" style={{color:'#C85510'}}>•</span>conf {Number(c.confidence_score).toFixed(2)}</span>}
+        {c.avg_influence_rate_pct != null && <span><span className="mr-1" style={{color:'#C26820'}}>•</span>{c.avg_influence_rate_pct}% campaign influence</span>}
+        {c.email_open_rate_pct    != null && <span><span className="mr-1" style={{color:'#C26820'}}>•</span>{c.email_open_rate_pct}% email open rate</span>}
+        {c.total_orders           != null && <span><span className="mr-1" style={{color:'#C26820'}}>•</span>{c.total_orders} orders</span>}
+        {c.lifetime_revenue       != null && <span><span className="mr-1" style={{color:'#C26820'}}>•</span>${Number(c.lifetime_revenue).toFixed(0)} LTV</span>}
+        {c.confidence_score       != null && <span><span className="mr-1" style={{color:'#C26820'}}>•</span>confidence {Number(c.confidence_score).toFixed(2)}</span>}
       </div>
     </div>
   )
@@ -137,7 +233,7 @@ export default function Customers() {
           <button key={f.id} onClick={() => { setFilter(f.id); setPage(1) }}
             className="text-[11px] font-semibold px-3 py-1.5 rounded-full transition-colors"
             style={filter === f.id
-              ? { background: '#17274C', color: '#fff', border: '1px solid #17274C' }
+              ? { background: '#1D3251', color: '#fff', border: '1px solid #1D3251' }
               : { background: 'white', color: '#6B7280', border: '1px solid #E5E7EB' }}>
             {f.label}
             {f.id !== 'all' && (
@@ -196,7 +292,7 @@ export default function Customers() {
       <div className="mt-3 text-[12px] text-gray-400 text-center">
         Showing {paged.length} of {filtered.length} · Click any row to expand Claude's reasoning
         {paged.length < filtered.length && (
-          <button onClick={() => setPage(p => p + 1)} className="ml-3 font-semibold hover:underline" style={{ color: '#C85510' }}>
+          <button onClick={() => setPage(p => p + 1)} className="ml-3 font-semibold hover:underline" style={{ color: '#C26820' }}>
             Load more
           </button>
         )}

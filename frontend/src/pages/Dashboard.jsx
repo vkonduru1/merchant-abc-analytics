@@ -11,11 +11,48 @@ const LABEL_META = {
   no_campaign_impact:  { color: '#ef4444', bg: '#FEF2F2', textColor: '#DC2626', text: 'No Campaign Impact',  action: 'Suppress — 90-day re-engagement' },
 }
 
+// Demo cards tell the ensemble routing story — 4 routing paths
 const DEMO_CUSTOMERS = [
-  { label: 'send_campaign',      segment: 'Repeat Purchaser · campaign_3_5',          confidence: 0.97, reasoning: 'Perfect 100% campaign influence rate across 8 orders. Approaching next purchase window at 43 days recency vs 68-day cycle. Exceptional 81% open rate confirms high receptivity.', signals: ['100% campaign influence rate · 8 campaign-era orders', '81.6% open rate · 30.6% click rate', '$1,368 LTV · AOV $114'] },
-  { label: 'dont_send',          segment: 'Repeat Purchaser · campaign_3_5',          confidence: 0.91, reasoning: 'Purchased 3 days ago — post-purchase experience window. Strong campaign-driven buyer history. Re-queue in 2 weeks when outside post-purchase suppression window.', signals: ['3 days since last purchase · 5 orders total', '78% open rate · 29% click rate', '$312 LTV · post-purchase window active'] },
-  { label: 'no_campaign_needed', segment: 'Repeat Purchaser · no_campaign_influence', confidence: 0.97, reasoning: '14 orders with $1,035 LTV and a 0% campaign influence rate. Pure brand loyalty — purchases organically without campaign prompting. Protect from cadence fatigue.', signals: ['0% campaign influence rate · 7 organic orders', '0% email open rate — unsubscribed or ignoring', '$1,035 LTV · AOV $73'] },
-  { label: 'no_campaign_impact', segment: 'Prospect · never_purchased',               confidence: 0.95, reasoning: '18 campaigns received with zero conversions and only 5.6% open rate — well below the 10% engagement threshold. Route to 90-day re-engagement flow before any further sends.', signals: ['0 orders · 18 campaigns received · 0 conversions', '5.6% open rate · 1.1% click rate', '$0 LTV · route to re-engagement flow'] },
+  {
+    label: 'send_campaign',
+    routing: 'ML · High Confidence',
+    routingColor: '#6EE7B7', routingBg: 'rgba(110,231,183,0.12)',
+    segment: 'Repeat Purchaser · Campaign Driven',
+    confidence: 0.95,
+    reasoning: 'Purchases consistently within 2 days of receiving a campaign. Approaching her next expected purchase window — 43 days since last order against a 68-day cycle. One of your most reliable responders.',
+    signals: ['100% campaign influence rate · 8 orders', '82% email open rate · 31% click rate', '$1,368 LTV · AOV $114'],
+    routingNote: 'RFC confidence 95% → ML decides automatically',
+  },
+  {
+    label: 'no_campaign_needed',
+    routing: 'Claude · Edge Case Reasoning',
+    routingColor: '#93C5FD', routingBg: 'rgba(147,197,253,0.12)',
+    segment: 'Loyal Buyer · Organic Purchaser',
+    confidence: 0.92,
+    reasoning: '14 orders and $1,035 LTV with zero campaign influence. Buys on his own schedule regardless of what you send. Protect from cadence fatigue — reserve this customer for NPIs, exclusive launches, and seasonal moments only.',
+    signals: ['0% campaign influence rate · pure organic buyer', '0% email open rate — unsubscribed or ignoring', '$1,035 LTV · AOV $73'],
+    routingNote: 'RFC confidence 51% → Claude reasons through the signals',
+  },
+  {
+    label: 'no_campaign_impact',
+    routing: 'ML · Flagged for Review',
+    routingColor: '#FCD34D', routingBg: 'rgba(252,211,77,0.12)',
+    segment: 'Occasional Buyer · Low Engagement',
+    confidence: 0.71,
+    reasoning: '18 campaigns received with no measurable response and a 5.6% open rate. Spend was concentrated in early 2022 and has since stalled. Suppress from regular cadence and route to a 90-day re-engagement flow before resuming.',
+    signals: ['18 campaigns · 0 influenced purchases', 'Last order 8 months ago — significant drift', '$142 LTV · no recent activity'],
+    routingNote: 'RFC confidence 71% → ML label, flagged for human review',
+  },
+  {
+    label: 'dont_send',
+    routing: 'Both Pipelines Agree',
+    routingColor: '#CBD5E1', routingBg: 'rgba(203,213,225,0.10)',
+    segment: 'Recent Purchaser · Post-Purchase Window',
+    confidence: 0.88,
+    reasoning: 'Purchased 6 days ago. Both the ML model and Claude agree — sending now risks fatigue and unsubscribe. Strong campaign-driven buyer history means she is a good candidate again once the purchase cycle resets in two weeks.',
+    signals: ['6 days since last order — post-purchase window', 'ML + Claude both predict dont_send', 'High campaign influence rate — re-queue in 2 weeks'],
+    routingNote: '74% of customers: both pipelines reach the same label',
+  },
 ]
 
 function StatCard({ label, value, sub }) {
@@ -58,40 +95,48 @@ function DemoLoop() {
   const c = DEMO_CUSTOMERS[idx]
   const meta = LABEL_META[c.label]
   return (
-    <div className="bg-brand-navy rounded-xl p-5 flex flex-col" style={{ minHeight: 300 }}>
+    <div className="rounded-xl p-5 flex flex-col" style={{ background: '#1D3251', minHeight: 300 }}>
       <div className="flex justify-between items-center mb-4">
         <div>
-          <div className="text-[11px] font-bold tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.4)' }}>Agent Reasoning</div>
+          <div className="text-[11px] font-bold tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.38)' }}>Agent Reasoning</div>
           <div className="text-[13px] font-semibold text-white mt-0.5">Live Demo — auto-cycles every 6s</div>
         </div>
         <div className="text-[10px] font-bold tracking-wide px-2 py-1 rounded border"
-          style={{ background: 'rgba(200,85,16,0.2)', borderColor: '#C85510', color: '#C85510' }}>LIVE</div>
+          style={{ background: 'rgba(194,104,32,0.18)', borderColor: '#C26820', color: '#D4884A' }}>LIVE</div>
       </div>
-      <div className="flex-1 rounded-lg p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="text-[10px] tracking-widest uppercase mb-2.5" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>{c.segment}</div>
+      <div className="flex-1 rounded-lg p-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
+        {/* Routing badge */}
+        <div className="inline-flex items-center px-2.5 py-1 rounded-full mb-3 text-[10px] font-bold tracking-wide uppercase"
+          style={{ background: c.routingBg, color: c.routingColor, border: `1px solid ${c.routingColor}50` }}>
+          {c.routing}
+        </div>
+        <div className="text-[10px] tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.38)', fontFamily: 'monospace' }}>{c.segment}</div>
         <div className="flex items-center gap-2.5 mb-3">
           <span className="text-[10px] font-bold tracking-wide uppercase px-2.5 py-1 rounded text-white" style={{ background: meta.color }}>{meta.text}</span>
-          <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Confidence {c.confidence.toFixed(2)}</span>
+          <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Confidence {c.confidence.toFixed(2)}</span>
         </div>
-        <div className="h-[3px] rounded-full mb-3.5" style={{ background: 'rgba(255,255,255,0.1)' }}>
-          <div className="h-[3px] rounded-full transition-all duration-500" style={{ background: meta.color, width: `${c.confidence * 100}%` }} />
+        <div className="h-[3px] rounded-full mb-3.5" style={{ background: 'rgba(255,255,255,0.08)' }}>
+          <div className="h-[3px] rounded-full transition-all duration-700" style={{ background: meta.color, width: `${c.confidence * 100}%` }} />
         </div>
-        <p className="text-[13px] leading-relaxed mb-3 italic" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Georgia, serif', margin: '0 0 12px' }}>
+        <p className="text-[13px] leading-relaxed mb-3 italic" style={{ color: 'rgba(255,255,255,0.82)', fontFamily: 'Georgia, serif', margin: '0 0 12px' }}>
           "{c.reasoning}"
         </p>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 mb-3">
           {c.signals.map((s, i) => (
-            <div key={i} className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              <span className="mr-1.5" style={{ color: '#C85510' }}>•</span>{s}
+            <div key={i} className="text-[11px]" style={{ color: 'rgba(255,255,255,0.48)' }}>
+              <span className="mr-1.5" style={{ color: '#C26820' }}>•</span>{s}
             </div>
           ))}
+        </div>
+        <div className="text-[10px] italic pt-2" style={{ color: 'rgba(255,255,255,0.28)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {c.routingNote}
         </div>
       </div>
       <div className="flex justify-center gap-2 mt-3.5">
         {DEMO_CUSTOMERS.map((_, i) => (
           <button key={i} onClick={() => { setIdx(i); clearInterval(timerRef.current); timerRef.current = setInterval(() => setIdx(n => (n + 1) % DEMO_CUSTOMERS.length), 6000) }}
             className="w-2 h-2 rounded-full transition-colors duration-300"
-            style={{ background: i === idx ? '#C85510' : 'rgba(255,255,255,0.2)' }} />
+            style={{ background: i === idx ? '#C26820' : 'rgba(255,255,255,0.18)' }} />
         ))}
       </div>
     </div>
@@ -186,13 +231,13 @@ export default function Dashboard() {
         <div className="flex items-end gap-1" style={{ height: 80 }}>
           {REVENUE_BARS.map((b, i) => (
             <div key={i} style={{ flex: 1, borderRadius: '2px 2px 0 0', height: `${b.h}%`,
-              background: b.hol ? '#C85510' : b.s ? '#C2CBE8' : '#E4E6EE',
+              background: b.hol ? '#C26820' : b.s ? '#C2CBE8' : '#E4E6EE',
               opacity: b.hol && i < 12 ? 0.7 : b.hol && i < 24 ? 0.8 : 1 }} />
           ))}
         </div>
         <div className="flex justify-between mt-1.5 text-[10px] text-gray-400">
           <span>Jan 2022</span>
-          <span className="font-semibold" style={{ color: '#C85510' }}>▲ Nov/Dec holiday peaks</span>
+          <span className="font-semibold" style={{ color: '#C26820' }}>▲ Nov/Dec holiday peaks</span>
           <span className="font-semibold" style={{ color: '#C2CBE8' }}>▲ Summer cold brew</span>
           <span>Dec 2024</span>
         </div>

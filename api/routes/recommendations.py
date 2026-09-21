@@ -5,19 +5,33 @@ All queries JOIN customer_recommendations → customer_derivatives → customers
 so every response carries both the agent output AND the underlying features.
 
 Endpoints
-  GET /recommendations/                → paginated list, newest first
-  GET /recommendations/summary         → count + avg LTV by label (dashboard scorecard)
-  GET /recommendations/scorecard       → rich scorecard for the dashboard hero panel
-  GET /recommendations/{customer_id}   → single customer full detail
+  GET  /recommendations/                    → paginated list, newest first
+  GET  /recommendations/summary             → count + avg LTV by label (dashboard scorecard)
+  GET  /recommendations/scorecard           → rich scorecard for the dashboard hero panel
+  POST /recommendations/translate-reasoning → merchant-friendly reasoning via Claude (server-side proxy)
+  GET  /recommendations/{customer_id}       → single customer full detail
 """
+import os
 import json
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+import anthropic
+
 from database import get_db
 
 router = APIRouter()
+
+
+# ── Pydantic model for translate-reasoning request ─────────────────────────
+class TranslateReasoningRequest(BaseModel):
+    customer_id: Optional[str] = None   # used for DB cache lookup + write
+    reasoning:   str
+    key_signals: list[str] = []
+    orders:      int = 0
+    ltv:         float = 0.0
 
 
 # ── Helper: parse key_signals TEXT → list ─────────────────────────────────
@@ -182,6 +196,93 @@ async def scorecard(db: AsyncSession = Depends(get_db)):
         "scorecard": segments,
         "totals": total_row,
     }
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# POST /recommendations/translate-reasoning
+# Server-side proxy to Anthropic — keeps the API key off the browser.
+# Translates internal ML reasoning strings into merchant-friendly language.
+# Uses Claude Haiku (cheapest) — translation only, ~80 tokens per call.
+# ══════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════
+# POST /recommendations/translate-reasoning
+# DB-cached translation — Claude called ONCE per customer, ever.
+# Subsequent calls read from customer_recommendations_ml.friendly_reasoning.
+# Re-run the batch script to refresh translations after ML cases change.
+# ══════════════════════════════════════════════════════════════════════════
+@router.post("/translate-reasoning")
+async def translate_reasoning(
+    body: TranslateReasoningRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    1. Check DB for existing friendly_reasoning on this customer.
+    2. If found → return immediately, zero Claude tokens used.
+    3. If not → call Claude, write to DB, return translation.
+
+    customer_id is optional in the request body — if not provided,
+    translation is generated but not cached (safe fallback).
+    """
+    customer_id = getattr(body, 'customer_id', None)
+
+    # Step 1 — check DB cache
+    if customer_id:
+        cached = await db.execute(text("""
+            SELECT friendly_reasoning
+            FROM customer_recommendations_ml
+            WHERE customer_id = :cid
+              AND friendly_reasoning IS NOT NULL
+              AND friendly_reasoning != ''
+            LIMIT 1
+        """), {"cid": str(customer_id)})
+        row = cached.mappings().first()
+        if row and row["friendly_reasoning"]:
+            return {"translation": row["friendly_reasoning"], "cached": True}
+
+    # Step 2 — call Claude
+    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY not configured")
+
+    import re
+    cleaned = re.sub(r'ML pipeline \(v\d+\)\s*', '', body.reasoning, flags=re.I)
+    cleaned = re.sub(r'ml-case\w+-?\w*', '', cleaned, flags=re.I)
+    cleaned = re.sub(r'HYP_TP|HYP_FP|HYP_FN|HYP_TN', '', cleaned, flags=re.I)
+    cleaned = re.sub(r'classifies as\s+[A-Z_]+\s*—\s*', '', cleaned, flags=re.I)
+    cleaned = re.sub(r'RFC signals (Likely|Unlikely);?\s*', '', cleaned, flags=re.I)
+    cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
+
+    prompt = (
+        "You are helping a merchant understand why their AI system made a "
+        "recommendation about a customer.\n\n"
+        "Translate this technical reasoning into exactly 2 clear sentences a merchant "
+        "can act on. Plain English only. No model names, no jargon, no confidence "
+        "scores, no version numbers. Focus on: what this customer does, and what the "
+        "merchant should do next.\n\n"
+        f"Technical reasoning: {cleaned}\n"
+        f"Key signals: {', '.join(body.key_signals[:3])}\n"
+        f"Customer: {body.orders} orders, ${int(body.ltv)} lifetime value\n\n"
+        "Respond with exactly 2 sentences. No preamble or labels."
+    )
+
+    client = anthropic.AsyncAnthropic(api_key=api_key)
+    message = await client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=120,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    translation = message.content[0].text.strip() if message.content else cleaned
+
+    # Step 3 — write to DB so next call is free
+    if customer_id:
+        await db.execute(text("""
+            UPDATE customer_recommendations_ml
+            SET friendly_reasoning = :fr
+            WHERE customer_id = :cid
+        """), {"fr": translation, "cid": str(customer_id)})
+        await db.commit()
+
+    return {"translation": translation, "cached": False}
 
 
 # ══════════════════════════════════════════════════════════════════════════

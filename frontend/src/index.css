@@ -2,8 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Softened brand palette — less heavy on the eyes */
+  --navy:          #1D3251;   /* was #17274C — 15% lighter */
+  --navy-dark:     #17274C;   /* original, kept for headings only */
+  --orange:        #C26820;   /* was #C85510 — desaturated, warmer */
+  --orange-soft:   #F5E6D3;
+
+  /* Text scale */
+  --text-primary:  #111827;
+  --text-secondary:#374151;
+  --text-muted:    #6B7280;
+}
+
 body {
   font-family: 'Space Grotesk', sans-serif;
   background-color: #FBF8F2;
-  color: #17274C;
+  color: var(--text-primary);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04";
 }

@@ -23,31 +23,32 @@ export default function App() {
 
       <div className="flex min-h-screen" style={{ background: '#FBF8F2', fontFamily: "'Space Grotesk', system-ui, sans-serif" }}>
 
-        {/* Sidebar */}
-        <div className="w-[220px] flex-shrink-0 flex flex-col py-6" style={{ background: '#17274C' }}>
+        {/* Sidebar — softened navy, higher contrast text */}
+        <div className="w-[220px] flex-shrink-0 flex flex-col py-6" style={{ background: '#1D3251' }}>
           {/* Logo */}
-          <div className="px-5 pb-7" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-            <div className="text-[18px] font-bold text-white tracking-tight">☕ merchant-abc</div>
-            <div className="text-[10px] tracking-widest uppercase mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <div className="px-5 pb-7" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="text-[17px] font-bold text-white tracking-tight">☕ merchant-abc</div>
+            <div className="text-[10px] tracking-widest uppercase mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
               Analytics Platform
             </div>
           </div>
 
           {/* Nav */}
-          <nav className="px-3 py-4 flex flex-col gap-1">
+          <nav className="px-3 py-4 flex flex-col gap-0.5">
             {NAV.map(({ to, label }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `block px-3 py-2.5 rounded-lg text-[13px] transition-colors ${
-                    isActive
-                      ? 'font-semibold text-white'
-                      : 'text-white/60 hover:text-white/90 hover:bg-white/5'
+                  `block px-3 py-2.5 rounded-lg text-[13.5px] font-medium transition-colors ${
+                    isActive ? 'font-semibold text-white' : 'hover:bg-white/6'
                   }`
                 }
-                style={({ isActive }) => isActive ? { background: '#C85510' } : {}}
+                style={({ isActive }) => isActive
+                  ? { background: '#C26820' }
+                  : { color: 'rgba(255,255,255,0.72)' }
+                }
               >
                 {label}
               </NavLink>
@@ -55,9 +56,9 @@ export default function App() {
           </nav>
 
           {/* Footer */}
-          <div className="mt-auto px-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <div className="text-[10px] tracking-wide uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>AIIR Framework</div>
-            <div className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.2)' }}>Built with Claude</div>
+          <div className="mt-auto px-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="text-[10px] tracking-wide uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>AIIR Framework</div>
+            <div className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Built with Claude</div>
           </div>
         </div>
 
